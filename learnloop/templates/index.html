@@ -39,11 +39,13 @@
   <div class="goal-grid">
     {% for goal in goals %}
     <article class="goal-card">
+      <a class="goal-card-link" href="{{ url_for('main.goal_detail', goal_id=goal.id) }}" aria-label="Otwórz cel {{ goal.title }}">
       <div class="goal-card-top"><span class="category-tag">{{ goal.category }}</span><span class="status-dot status-{{ goal.status }}">{{ {'active': 'Aktywny', 'paused': 'Wstrzymany', 'completed': 'Ukończony'}[goal.status] }}</span></div>
-      <a class="goal-title" href="{{ url_for('main.goal_detail', goal_id=goal.id) }}">{{ goal.title }}</a>
+      <span class="goal-title">{{ goal.title }}</span>
       <p class="goal-description">{{ goal.description or 'Każda sesja przybliża Cię do celu. Dodaj notatkę, żeby pamiętać, od czego zacząć.' }}</p>
       <div class="goal-progress"><div class="progress-label"><span>{{ goal.session_count }} {% if goal.session_count == 1 %}sesja{% elif goal.session_count in [2,3,4] %}sesje{% else %}sesji{% endif %}</span><span>{{ (goal.total_minutes // 60) }} h {{ goal.total_minutes % 60 }} min</span></div></div>
-      <div class="goal-card-bottom"><span class="due-date">{% if goal.target_date %}<span aria-hidden="true">◷</span> Termin: {{ goal.target_date }}{% else %}Bez terminu{% endif %}</span><a class="arrow-link" href="{{ url_for('main.goal_detail', goal_id=goal.id) }}" aria-label="Otwórz cel {{ goal.title }}">↗</a></div>
+      <div class="goal-card-bottom"><span class="due-date">{% if goal.target_date %}<span aria-hidden="true">◷</span> Termin: {{ goal.target_date }}{% else %}Bez terminu{% endif %}</span><span class="arrow-link" aria-hidden="true">↗</span></div>
+      </a>
     </article>
     {% endfor %}
   </div>
