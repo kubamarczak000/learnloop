@@ -36,7 +36,7 @@ cd learnloop
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -e .
+python -m pip install -e '.[dev]'
 cp .env.example .env
 ```
 
@@ -56,7 +56,7 @@ cd learnloop
 py -3.11 -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install -e .
+python -m pip install -e '.[dev]'
 Copy-Item .env.example .env
 ```
 
@@ -67,6 +67,16 @@ flask --app learnloop:create_app run --debug
 ```
 
 Serwer deweloperski Flask jest przeznaczony do lokalnej pracy i nauki. Nie wystawiaj go bezpośrednio do publicznego internetu.
+
+## Uruchamianie testów
+
+Testy korzystają z osobnej, tymczasowej bazy danych, więc nie zmieniają Twoich celów w `instance/naukaplan.sqlite3`. Po instalacji zależności deweloperskich uruchom w katalogu projektu:
+
+```bash
+python -m pytest
+```
+
+Każdy zielony `.` oznacza zaliczony test. Jeśli pojawi się błąd, pytest pokaże nazwę testu i szczegóły, które pomogą znaleźć przyczynę.
 
 ## Gdzie są dane?
 
