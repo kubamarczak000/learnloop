@@ -4,6 +4,8 @@
 
 > Projekt portfolio w Pythonie. Interfejs i instrukcje są po polsku. Aplikacja działa na własnym komputerze, a dane zapisuje w lokalnym pliku SQLite.
 
+Repozytorium: [github.com/kubamarczak000/learnloop](https://github.com/kubamarczak000/learnloop)
+
 ## Co potrafi
 
 - Tworzy, edytuje i usuwa cele z opisem, kategorią i opcjonalnym terminem.
@@ -13,10 +15,6 @@
 - Filtruje listę po statusie, a także wyszukuje tytuły i kategorie.
 - Chroni formularze tokenem CSRF i waliduje dane po stronie serwera.
 - Zachowuje dane po zamknięciu aplikacji w bazie SQLite.
-
-## Zrzuty ekranu
-
-Po uruchomieniu projektu zrób zrzuty widoku przeglądu i szczegółów celu, a następnie dodaj je tutaj, na przykład do katalogu `docs/screenshots/`. Autentyczne zrzuty z działającej aplikacji pomagają rekruterowi szybko zrozumieć projekt.
 
 ## Wymagania
 
@@ -28,19 +26,19 @@ Nie potrzebujesz konta, zewnętrznej bazy danych ani klucza API. Aplikacja może
 
 ## Uruchomienie lokalne
 
-### macOS / Linux
+### macOS
 
 ```bash
-git clone https://github.com/TWOJ_LOGIN/learnloop.git
+git clone https://github.com/kubamarczak000/learnloop.git
 cd learnloop
-python3 -m venv .venv
+python3.14 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -e '.[dev]'
 cp .env.example .env
 ```
 
-Otwórz `.env`, wstaw własny losowy `SECRET_KEY`, a następnie uruchom:
+Wygeneruj klucz poleceniem `python -c 'import secrets; print(secrets.token_hex(32))'`, otwórz `.env` i wstaw go po `SECRET_KEY=`. Następnie uruchom:
 
 ```bash
 flask --app learnloop:create_app run --debug
@@ -51,7 +49,7 @@ Wejdź na [http://127.0.0.1:5000](http://127.0.0.1:5000).
 ### Windows PowerShell
 
 ```powershell
-git clone https://github.com/TWOJ_LOGIN/learnloop.git
+git clone https://github.com/kubamarczak000/learnloop.git
 cd learnloop
 py -3.11 -m venv .venv
 .venv\Scripts\Activate.ps1
@@ -70,17 +68,17 @@ Serwer deweloperski Flask jest przeznaczony do lokalnej pracy i nauki. Nie wysta
 
 ## Uruchamianie testów
 
-Testy korzystają z osobnej, tymczasowej bazy danych, więc nie zmieniają Twoich celów w `instance/naukaplan.sqlite3`. Po instalacji zależności deweloperskich uruchom w katalogu projektu:
+Testy korzystają z osobnej, tymczasowej bazy danych, więc nie zmieniają lokalnych celów. Po instalacji zależności deweloperskich uruchom w katalogu projektu:
 
 ```bash
 python -m pytest
 ```
 
-Każdy zielony `.` oznacza zaliczony test. Jeśli pojawi się błąd, pytest pokaże nazwę testu i szczegóły, które pomogą znaleźć przyczynę.
+Zestaw zawiera cztery testy sprawdzające widok główny, tworzenie i wyszukiwanie celu, walidację tytułu oraz dodawanie sesji. Każdy zielony `.` oznacza zaliczony test. Jeśli pojawi się błąd, pytest pokaże nazwę testu i szczegóły.
 
 ## Gdzie są dane?
 
-Przy pierwszym uruchomieniu aplikacja utworzy katalog `instance/` i plik `naukaplan.sqlite3` (nazwa pliku bazy pozostaje taka sama, by zachować istniejące dane po zmianie nazwy aplikacji). Ten katalog jest celowo pomijany przez Git, więc Twoje lokalne cele nie trafią przez pomyłkę do repozytorium. Możesz wskazać inny plik, ustawiając `DATABASE_PATH` w `.env`.
+Przy pierwszym uruchomieniu aplikacja utworzy katalog `instance/` i plik `naukaplan.sqlite3`. Katalog jest pomijany przez Git, więc prywatne cele i sesje pozostają na Twoim komputerze. Możesz wskazać inny plik, ustawiając `DATABASE_PATH` w `.env`.
 
 ## Jak to jest zbudowane
 
@@ -104,19 +102,19 @@ Przeglądarka wysyła żądanie do widoku Flask. Widok sprawdza dane, korzysta z
 
 ## Jak uczyć się na tym projekcie
 
-Możesz przejść repozytorium od prostszych pojęć do bardziej zaawansowanych:
+Kod pozwala ćwiczyć kolejne zagadnienia Pythona i tworzenia aplikacji webowych:
 
 1. Przeczytaj `learnloop/routes.py` i prześledź drogę formularza od URL do zapisu w bazie.
 2. Zmień pole celu (np. dodaj „poziom trudności”) w formularzu, walidacji i schemacie.
 3. Przejrzyj zapytania z `JOIN`, agregatami `SUM` i `COUNT` w widoku przeglądu.
 4. Zobacz, jak szablony Jinja dziedziczą wspólny układ z `base.html`.
-5. Dodaj własną funkcję, opisz ją w README i umieść na osobnym branchu Git.
+5. Sprawdź testy w `tests/test_app.py` i rozbuduj je, gdy dodasz nową funkcję.
 
 Przed większymi zmianami zrób commit. Jeśli przypadkowo usuniesz lokalną bazę, SQLite utworzy pustą przy kolejnym uruchomieniu — dlatego przed eksperymentami skopiuj plik `instance/naukaplan.sqlite3`.
 
 ## Rozwój projektu
 
-Aktualna wersja to kompletna baza do samodzielnego rozwoju. Propozycje kolejnych etapów wraz z tematami do nauki są w [docs/ROADMAP.md](docs/ROADMAP.md). Taki plan pozwala rozwijać projekt przez kolejne tygodnie i miesiące bez przypisywania mu fikcyjnej historii.
+Aktualna wersja zawiera cele, sesje nauki, wyszukiwanie, statystyki oraz podstawowy zestaw testów. Kolejne pomysły na rozwój i zagadnienia do nauki opisuje [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Licencja
 
