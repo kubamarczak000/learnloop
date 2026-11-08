@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Przegląd · LearnLoop{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">TWOJA PRZESTRZEŃ DO NAUKI</p>
+    <h1>Ucz się po swojemu.<br><span>Śledź swój postęp.</span></h1>
+    <p class="hero-text">Zamień duże plany w małe sesje. Każdy krok przybliża Cię do celu.</p>
+    <a class="button" href="{{ url_for('main.new_goal') }}">Zaplanuj cel <span aria-hidden="true">↗</span></a>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <div class="sun"></div><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+    <div class="book book-back"></div><div class="book book-front"><span>learn<br>something<br>new</span><i>✳</i></div>
+    <div class="spark spark-one">✦</div><div class="spark spark-two">✳</div><div class="spark spark-three">✦</div>
+  </div>
+</section>
+
+<section class="stats-grid" aria-label="Twoje statystyki">
+  <article class="stat-card"><div class="stat-icon icon-lime">◎</div><div><p>Aktywne cele</p><strong>{{ stats.active_count or 0 }}</strong></div><span class="stat-caption">do zrealizowania</span></article>
+  <article class="stat-card"><div class="stat-icon icon-peach">✦</div><div><p>Ukończone</p><strong>{{ stats.completed_count or 0 }}</strong></div><span class="stat-caption">małe wielkie wygrane</span></article>
+  <article class="stat-card"><div class="stat-icon icon-lavender">◷</div><div><p>Czas nauki</p><strong>{{ (total_minutes // 60) }}<small> h</small> {{ total_minutes % 60 }}<small> min</small></strong></div><span class="stat-caption">zapisane sesje</span></article>
+</section>
+
+<section class="goals-section">
+  <div class="section-heading">
+    <div><p class="eyebrow">KROK PO KROKU</p><h2>Twoje cele</h2></div>
+    <a class="text-link" href="{{ url_for('main.new_goal') }}">Dodaj cel <span aria-hidden="true">＋</span></a>
+  </div>
+  <form class="toolbar" method="get" action="{{ url_for('main.index') }}">
+    <label class="search-box"><span aria-hidden="true">⌕</span><input type="search" name="q" value="{{ search }}" placeholder="Szukaj celu lub kategorii…" aria-label="Szukaj celu lub kategorii"></label>
+    <div class="filter-pills" aria-label="Filtr statusu">
+      {% for value, label in [('all', 'Wszystkie'), ('active', 'Aktywne'), ('paused', 'Wstrzymane'), ('completed', 'Ukończone')] %}
+        <button name="status" value="{{ value }}" class="filter-pill {% if selected_status == value %}selected{% endif %}">{{ label }}</button>
+      {% endfor %}
+    </div>
+  </form>
+
+  {% if goals %}
+  <div class="goal-grid">
+    {% for goal in goals %}
+    <article class="goal-card">
+      <div class="goal-card-top"><span class="category-tag">{{ goal.category }}</span><span class="status-dot status-{{ goal.status }}">{{ {'active': 'Aktywny', 'paused': 'Wstrzymany', 'completed': 'Ukończony'}[goal.status] }}</span></div>
+      <a class="goal-title" href="{{ url_for('main.goal_detail', goal_id=goal.id) }}">{{ goal.title }}</a>
+      <p class="goal-description">{{ goal.description or 'Każda sesja przybliża Cię do celu. Dodaj notatkę, żeby pamiętać, od czego zacząć.' }}</p>
+      <div class="goal-progress"><div class="progress-label"><span>{{ goal.session_count }} {% if goal.session_count == 1 %}sesja{% elif goal.session_count in [2,3,4] %}sesje{% else %}sesji{% endif %}</span><span>{{ (goal.total_minutes // 60) }} h {{ goal.total_minutes % 60 }} min</span></div></div>
+      <div class="goal-card-bottom"><span class="due-date">{% if goal.target_date %}<span aria-hidden="true">◷</span> Termin: {{ goal.target_date }}{% else %}Bez terminu{% endif %}</span><a class="arrow-link" href="{{ url_for('main.goal_detail', goal_id=goal.id) }}" aria-label="Otwórz cel {{ goal.title }}">↗</a></div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="empty-icon">✳</div><h3>{% if search %}Nie znaleziono celów{% else %}Tu zaczyna się Twój postęp{% endif %}</h3><p>{% if search %}Zmień wyszukiwaną frazę lub filtr.{% else %}Dodaj pierwszy cel, na przykład „Podstawy Pythona”, i zaplanuj swoją pierwszą sesję.{% endif %}</p>{% if not search %}<a class="button" href="{{ url_for('main.new_goal') }}">Dodaj pierwszy cel <span aria-hidden="true">↗</span></a>{% endif %}</div>
+  {% endif %}
+</section>
+{% endblock %}

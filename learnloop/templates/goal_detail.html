@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ goal.title }} · LearnLoop{% endblock %}
+{% block content %}
+<div class="detail-page">
+  <a class="back-link" href="{{ url_for('main.index') }}">← Wróć do przeglądu</a>
+  <section class="detail-hero panel">
+    <div class="goal-card-top"><span class="category-tag">{{ goal.category }}</span><span class="status-dot status-{{ goal.status }}">{{ {'active': 'Aktywny', 'paused': 'Wstrzymany', 'completed': 'Ukończony'}[goal.status] }}</span></div>
+    <h1>{{ goal.title }}</h1>
+    <p class="detail-description">{{ goal.description or 'Bez opisu. Możesz dodać więcej informacji, edytując cel.' }}</p>
+    <div class="detail-meta"><span>◷ {{ 'Termin: ' + goal.target_date if goal.target_date else 'Bez terminu' }}</span><span>✦ {{ total_minutes // 60 }} h {{ total_minutes % 60 }} min nauki</span></div>
+    <div class="detail-actions"><a class="button button-quiet" href="{{ url_for('main.edit_goal', goal_id=goal.id) }}">Edytuj cel</a>
+      <form method="post" action="{{ url_for('main.update_status', goal_id=goal.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="status" value="{{ 'completed' if goal.status != 'completed' else 'active' }}"><input type="hidden" name="next" value="{{ url_for('main.goal_detail', goal_id=goal.id) }}"><button class="button button-outline" type="submit">{{ 'Oznacz jako ukończony' if goal.status != 'completed' else 'Wznów cel' }}</button></form>
+    </div>
+  </section>
+  <div class="detail-columns">
+    <section class="panel session-panel"><div class="panel-heading"><div><p class="eyebrow">REGULARNOŚĆ ROBI RÓŻNICĘ</p><h2>Dodaj sesję</h2></div><span class="panel-icon">◷</span></div>
+      <form method="post" action="{{ url_for('main.add_session', goal_id=goal.id) }}" class="session-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="minutes">Czas nauki <span class="required">*</span></label><div class="input-suffix"><input id="minutes" name="minutes" type="number" min="1" max="1440" required placeholder="25"><span>min</span></div>
+        <label for="studied_on">Data <span class="required">*</span></label><input id="studied_on" name="studied_on" type="date" value="{{ today_iso }}" required>
+        <label for="note">Notatka <span class="optional">(opcjonalnie)</span></label><textarea id="note" name="note" rows="3" maxlength="500" placeholder="Czego dziś się nauczyłeś?">{{ request.form.get('note', '') }}</textarea>
+        <button class="button full-width" type="submit">Zapisz sesję <span aria-hidden="true">↗</span></button>
+      </form>
+    </section>
+    <section class="panel history-panel"><div class="panel-heading"><div><p class="eyebrow">TWÓJ PROCES</p><h2>Historia sesji</h2></div><span class="history-count">{{ sessions|length }}</span></div>
+      {% if sessions %}<div class="session-list">{% for session in sessions %}<article class="session-item"><div class="session-marker">✦</div><div class="session-content"><div class="session-top"><strong>{{ session.minutes }} min nauki</strong><time>{{ session.studied_on }}</time></div><p>{{ session.note or 'Sesja bez notatki — liczy się wykonany krok.' }}</p></div><form method="post" action="{{ url_for('main.delete_session', session_id=session.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="icon-button" type="submit" aria-label="Usuń sesję z dnia {{ session.studied_on }}">×</button></form></article>{% endfor %}</div>
+      {% else %}<div class="empty-history"><div>✎</div><h3>Twoja pierwsza sesja czeka</h3><p>Dodaj czas nauki, żeby zobaczyć postęp tutaj.</p></div>{% endif %}
+    </section>
+  </div>
+  <form class="delete-form" method="post" action="{{ url_for('main.delete_goal', goal_id=goal.id) }}" onsubmit="return confirm('Czy na pewno usunąć ten cel i wszystkie jego sesje?')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="danger-link" type="submit">Usuń ten cel</button></form>
+</div>
+{% endblock %}

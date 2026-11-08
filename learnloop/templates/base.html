@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7f2">
+  <title>{% block title %}LearnLoop{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('main.index') }}" aria-label="LearnLoop — strona główna">
+      <span class="brand-mark">L</span><span>Learn<span class="brand-light">Loop</span></span>
+    </a>
+    <nav aria-label="Główna nawigacja">
+      <a class="nav-link {% if request.endpoint == 'main.index' %}is-active{% endif %}" href="{{ url_for('main.index') }}">Przegląd</a>
+      <a class="button button-small" href="{{ url_for('main.new_goal') }}"><span aria-hidden="true">＋</span> Nowy cel</a>
+    </nav>
+  </header>
+  <main class="shell">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}<div class="flash-stack" role="status">
+        {% for category, message in messages %}<div class="flash flash-{{ category }}">{{ message }}</div>{% endfor %}
+      </div>{% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="footer"><span>LearnLoop</span><span>Małe kroki. Widoczny postęp.</span></footer>
+</body>
+</html>

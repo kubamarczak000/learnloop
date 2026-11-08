@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.python-version
+
+# Local app data and secrets
+instance/
+.env
+
+# Editors and operating systems
+.DS_Store
+.idea/
+.vscode/
+
