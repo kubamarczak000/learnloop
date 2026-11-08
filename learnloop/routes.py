@@ -1,6 +1,6 @@
 """Widoki i walidacja formularzy aplikacji."""
 
-from datetime import date
+from datetime import date, timedelta
 import sqlite3
 
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
@@ -81,14 +81,52 @@ def index():
     study = connection.execute(
         "SELECT COALESCE(SUM(minutes), 0) AS minutes FROM study_sessions"
     ).fetchone()["minutes"]
+    today = date.today()
+    week_start = today - timedelta(days=today.weekday())
+    week_end = week_start + timedelta(days=6)
+    week_minutes = connection.execute(
+        "SELECT COALESCE(SUM(minutes), 0) AS minutes FROM study_sessions WHERE studied_on BETWEEN ? AND ?",
+        (week_start.isoformat(), week_end.isoformat()),
+    ).fetchone()["minutes"]
+    weekly_goal = int(
+        connection.execute(
+            "SELECT setting_value FROM app_settings WHERE setting_key = 'weekly_goal_minutes'"
+        ).fetchone()["setting_value"]
+    )
+    weekly_progress = min(round(week_minutes / weekly_goal * 100), 100)
     return render_template(
         "index.html",
         goals=goals,
         stats=stats,
         total_minutes=study,
+        week_minutes=week_minutes,
+        week_start=week_start,
+        week_end=week_end,
+        weekly_goal=weekly_goal,
+        weekly_progress=weekly_progress,
         selected_status=selected_status,
         search=search,
     )
+
+
+@bp.post("/settings/weekly-goal")
+def update_weekly_goal():
+    raw_minutes = request.form.get("weekly_goal_minutes", "")
+    try:
+        weekly_goal = int(raw_minutes)
+    except ValueError:
+        weekly_goal = 0
+    if not 15 <= weekly_goal <= 10080:
+        flash("Tygodniowy cel musi wynosić od 15 do 10 080 minut.", "error")
+        return redirect(url_for("main.index"))
+    connection = get_db()
+    connection.execute(
+        "UPDATE app_settings SET setting_value = ? WHERE setting_key = 'weekly_goal_minutes'",
+        (str(weekly_goal),),
+    )
+    connection.commit()
+    flash("Zapisano tygodniowy cel nauki.", "success")
+    return redirect(url_for("main.index"))
 
 
 @bp.route("/goals/new", methods=["GET", "POST"])

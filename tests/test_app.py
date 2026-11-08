@@ -1,5 +1,7 @@
 """Testy najważniejszych zachowań LearnLoop."""
 
+from datetime import date
+
 import pytest
 
 from learnloop import create_app
@@ -76,4 +78,33 @@ def test_user_can_add_study_session(client):
     page = response.get_data(as_text=True)
     assert "25 min nauki" in page
     assert "Zmienne i typy" in page
+
+
+def test_weekly_goal_can_be_changed_and_tracks_this_week(client):
+    add_goal(client)
+    client.post(
+        "/goals/1/sessions",
+        data={"minutes": "25", "studied_on": date.today().isoformat(), "note": "Powtórka"},
+    )
+
+    response = client.post(
+        "/settings/weekly-goal",
+        data={"weekly_goal_minutes": "60"},
+        follow_redirects=True,
+    )
+
+    page = response.get_data(as_text=True)
+    assert response.status_code == 200
+    assert "25 min z 1 h 0 min" in page
+    assert "42% celu" in page
+
+
+def test_weekly_goal_rejects_values_below_minimum(client):
+    response = client.post(
+        "/settings/weekly-goal",
+        data={"weekly_goal_minutes": "0"},
+        follow_redirects=True,
+    )
+
+    assert "Tygodniowy cel musi wynosić od 15 do 10 080 minut." in response.get_data(as_text=True)
 

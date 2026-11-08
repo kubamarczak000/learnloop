@@ -5,7 +5,7 @@ To propozycja pracy rozłożonej na 8 tygodni. Etapy są przyszłym planem nauki
 ## Etap 1 — solidne podstawy
 
 - [ ] Poznaj strukturę Flask i fabrykę `create_app`.
-- [ ] Dodaj automatyczne testy dla walidacji, formularzy i zapytań.
+- [x] Dodaj automatyczne testy dla podstawowych formularzy i zachowań.
 - [ ] Naucz się uruchamiać testy i sprawdzać pokrycie kodu.
 - **Tematy:** funkcje, importy, wyjątki, pytest, klient testowy Flask.
 
@@ -20,7 +20,7 @@ To propozycja pracy rozłożonej na 8 tygodni. Etapy są przyszłym planem nauki
 
 - [ ] Pozwól ustawić docelową liczbę minut albo sesji dla celu.
 - [ ] Pokaż wykres czasu nauki z ostatnich 7 i 30 dni.
-- [ ] Dodaj tygodniowy cel minut i informację o jego realizacji.
+- [x] Dodaj tygodniowy cel minut i informację o jego realizacji.
 - **Tematy:** agregowanie danych, daty, dostępność wykresów.
 
 ## Etap 4 — wygodniejsze użycie
@@ -60,9 +60,9 @@ To propozycja pracy rozłożonej na 8 tygodni. Etapy są przyszłym planem nauki
 
 ## Proponowane kamienie milowe
 
-1. `v1.0.0` — lokalne cele i sesje (obecna baza projektu).
-2. `v1.1.0` — testy, migracje i ulepszona historia.
-3. `v1.2.0` — statystyki i dostępność.
+1. `v1.0.0` — lokalne cele i sesje.
+2. `v1.1.0` — testy i tygodniowy cel nauki (obecna wersja projektu).
+3. `v1.2.0` — migracje, ulepszona historia i dostępność.
 4. `v2.0.0` — użytkownicy, API i wdrożenie.
 
 Warto opisywać każdą zmianę zgodnie z tym, co naprawdę zostało zrobione: commitami, issue i krótkimi notatkami z nauki.

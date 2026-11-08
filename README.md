@@ -12,6 +12,7 @@ Repozytorium: [github.com/kubamarczak000/learnloop](https://github.com/kubamarcz
 - Oznacza cel jako aktywny, wstrzymany lub ukończony.
 - Zapisuje sesje nauki: datę, liczbę minut i krótką notatkę.
 - Pokazuje podsumowanie czasu, liczbę sesji i statystyki celów.
+- Śledzi tygodniowy cel nauki, domyślnie 3 godziny od poniedziałku do niedzieli; cel można zmienić.
 - Filtruje listę po statusie, a także wyszukuje tytuły i kategorie.
 - Chroni formularze tokenem CSRF i waliduje dane po stronie serwera.
 - Zachowuje dane po zamknięciu aplikacji w bazie SQLite.
@@ -74,7 +75,7 @@ Testy korzystają z osobnej, tymczasowej bazy danych, więc nie zmieniają lokal
 python -m pytest
 ```
 
-Zestaw zawiera cztery testy sprawdzające widok główny, tworzenie i wyszukiwanie celu, walidację tytułu oraz dodawanie sesji. Każdy zielony `.` oznacza zaliczony test. Jeśli pojawi się błąd, pytest pokaże nazwę testu i szczegóły.
+Zestaw zawiera sześć testów sprawdzających widok główny, tworzenie i wyszukiwanie celu, walidację tytułu, dodawanie sesji oraz ustawianie i walidację tygodniowego celu.
 
 ## Gdzie są dane?
 
@@ -98,6 +99,7 @@ Przeglądarka wysyła żądanie do widoku Flask. Widok sprawdza dane, korzysta z
 
 - **Cel (`goals`)** ma tytuł, opis, kategorię, opcjonalny termin, status i datę utworzenia.
 - **Sesja (`study_sessions`)** należy do jednego celu i przechowuje minuty, datę oraz notatkę.
+- **Ustawienie (`app_settings`)** przechowuje tygodniowy cel czasu nauki. Postęp jest liczony dla bieżącego tygodnia, od poniedziałku do niedzieli.
 - Usunięcie celu usuwa jego sesje dzięki relacji `ON DELETE CASCADE`.
 
 ## Jak uczyć się na tym projekcie

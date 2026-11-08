@@ -18,5 +18,13 @@ CREATE TABLE IF NOT EXISTS study_sessions (
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS app_settings (
+    setting_key TEXT PRIMARY KEY,
+    setting_value TEXT NOT NULL
+);
+
+INSERT OR IGNORE INTO app_settings (setting_key, setting_value)
+VALUES ('weekly_goal_minutes', '180');
+
 CREATE INDEX IF NOT EXISTS idx_goals_status ON goals(status);
 CREATE INDEX IF NOT EXISTS idx_sessions_goal_date ON study_sessions(goal_id, studied_on DESC);
