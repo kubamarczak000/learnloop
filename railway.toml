@@ -1,6 +1,5 @@
 [build]
 builder = "RAILPACK"
-buildCommand = "python -m pip install ."
 
 [deploy]
 startCommand = "gunicorn --bind 0.0.0.0:$PORT 'learnloop:create_app()'"
