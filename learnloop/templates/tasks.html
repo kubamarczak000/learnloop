@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% set status_labels = {'todo': 'Do zrobienia', 'in_progress': 'W trakcie', 'done': 'Ukończone'} %}
+{% set priority_labels = {'low': 'Niski', 'medium': 'Normalny', 'high': 'Wysoki'} %}
+{% block title %}Zadania do pracy · LearnLoop{% endblock %}
+{% block content %}
+<section class="tasks-intro">
+  <div><p class="eyebrow">PLANUJ I RÓB PO KOLEI</p><h1>Plan pracy</h1><p>Zbierz zadania w jednym miejscu, ustaw priorytety i zaplanuj czas.</p></div>
+  <a class="button" href="#new-task">Dodaj zadanie <span aria-hidden="true">＋</span></a>
+</section>
+
+<section class="task-stats" aria-label="Podsumowanie zadań">
+  <article><span>Do zrobienia</span><strong>{{ counts.todo or 0 }}</strong></article>
+  <article><span>W trakcie</span><strong>{{ counts.in_progress or 0 }}</strong></article>
+  <article><span>Ukończone</span><strong>{{ counts.done or 0 }}</strong></article>
+</section>
+
+<div class="tasks-layout">
+  <section class="tasks-list-section">
+    <div class="section-heading"><div><p class="eyebrow">TWOJA LISTA</p><h2>Zadania</h2></div><a class="text-link" href="{{ url_for('main.calendar_view') }}">Zobacz kalendarz →</a></div>
+    <div class="task-filters" aria-label="Filtr zadań">
+      {% for value, label in [('all', 'Wszystkie'), ('todo', 'Do zrobienia'), ('in_progress', 'W trakcie'), ('done', 'Ukończone')] %}
+      <a class="task-filter {% if selected_status == value %}selected{% endif %}" href="{{ url_for('main.work_tasks_view', status=value) }}">{{ label }}</a>
+      {% endfor %}
+    </div>
+    {% if tasks %}<div class="work-task-list">
+      {% for task in tasks %}
+      <article class="work-task {% if task.status == 'done' %}work-task-done{% endif %}">
+        <div class="task-priority priority-{{ task.priority }}" title="Priorytet: {{ priority_labels[task.priority] }}"><span></span>{{ priority_labels[task.priority] }}</div>
+        <div class="work-task-main"><h3>{{ task.title }}</h3>{% if task.description %}<p>{{ task.description }}</p>{% endif %}<div class="work-task-meta"><span class="task-status status-{{ task.status }}">{{ status_labels[task.status] }}</span><span>Szacunek: {{ task.estimate_minutes // 60 }} h {{ task.estimate_minutes % 60 }} min</span>{% if task.due_date %}<span class="{% if task.due_date < today_iso and task.status != 'done' %}task-overdue{% endif %}">Termin: {{ task.due_date }}</span>{% else %}<span>Bez terminu</span>{% endif %}</div></div>
+        <div class="task-controls">
+          <form method="post" action="{{ url_for('main.update_work_task_status', task_id=task.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="status" value="{{ {'todo': 'in_progress', 'in_progress': 'done', 'done': 'todo'}[task.status] }}"><button class="task-status-button" type="submit">{{ {'todo': 'Rozpocznij', 'in_progress': 'Zakończ', 'done': 'Przywróć'}[task.status] }}</button></form>
+          <form method="post" action="{{ url_for('main.delete_work_task', task_id=task.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="icon-button" type="submit" aria-label="Usuń zadanie {{ task.title }}">×</button></form>
+        </div>
+      </article>
+      {% endfor %}
+    </div>{% else %}<div class="empty-state task-empty"><div class="empty-icon">✓</div><h3>Brak zadań w tym widoku</h3><p>Dodaj zadanie albo wybierz inny filtr statusu.</p></div>{% endif %}
+  </section>
+
+  <aside class="panel task-form-panel" id="new-task"><p class="eyebrow">DODAJ DO PLANU</p><h2>Nowe zadanie</h2>
+    <form class="event-form" method="post" action="{{ url_for('main.add_work_task') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="task-title">Nazwa zadania</label><input id="task-title" name="title" maxlength="120" placeholder="np. Przygotować raport" required>
+      <label for="task-description">Opis <span>(opcjonalnie)</span></label><textarea id="task-description" name="description" rows="3" maxlength="2000" placeholder="Co trzeba zrobić?"></textarea>
+      <div class="event-form-row"><div><label for="task-priority">Priorytet</label><select id="task-priority" name="priority"><option value="medium">Normalny</option><option value="high">Wysoki</option><option value="low">Niski</option></select></div><div><label for="task-estimate">Czas (min)</label><input id="task-estimate" name="estimate_minutes" type="number" min="5" max="1440" step="5" value="30" required></div></div>
+      <label for="task-due-date">Termin <span>(opcjonalnie)</span></label><input id="task-due-date" name="due_date" type="date">
+      <button class="button full-width" type="submit">Zapisz zadanie <span aria-hidden="true">↗</span></button>
+    </form>
+  </aside>
+</div>
+{% endblock %}

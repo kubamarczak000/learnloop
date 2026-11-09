@@ -1,8 +1,8 @@
 # LearnLoop
 
-**LearnLoop** to lokalna aplikacja webowa do układania celów nauki i zapisywania czasu poświęconego na każdy z nich. Zamiast trzymać postanowienia w kilku notatnikach, możesz w jednym miejscu zaplanować temat, ustawić termin, robić krótkie sesje i wracać do własnych notatek.
+**LearnLoop** to lokalny planer nauki i pracy. Pozwala organizować cele nauki, zapisywać sesje, śledzić egzaminy oraz prowadzić listę zadań zawodowych w jednym miejscu.
 
-> Projekt portfolio w Pythonie. Interfejs i instrukcje są po polsku. Aplikacja działa na własnym komputerze, a dane zapisuje w lokalnym pliku SQLite.
+> Projekt portfolio w Pythonie. Interfejs i instrukcje są po polsku. LearnLoop można uruchomić lokalnie albo wdrożyć na Railway; w obu przypadkach używa bazy SQLite.
 
 Repozytorium: [github.com/kubamarczak000/learnloop](https://github.com/kubamarczak000/learnloop)
 
@@ -13,6 +13,12 @@ Repozytorium: [github.com/kubamarczak000/learnloop](https://github.com/kubamarcz
 - Zapisuje sesje nauki: datę, liczbę minut i krótką notatkę.
 - Pokazuje podsumowanie czasu, liczbę sesji i statystyki celów.
 - Śledzi tygodniowy cel nauki, domyślnie 3 godziny od poniedziałku do niedzieli; cel można zmienić.
+- Wyświetla miesięczny kalendarz egzaminów, kolokwiów i innych ważnych terminów.
+- Układa przed wydarzeniem plan maksymalnie 30 sesji trwających po 30 minut, na dni robocze w okresie do sześciu tygodni przed terminem.
+- Prowadzi osobny planer pracy z priorytetami, terminami, szacowanym czasem i statusami zadań.
+- Pokazuje terminy zadań zawodowych bezpośrednio w kalendarzu.
+- Udostępnia rejestrację i logowanie; cele, zadania, wydarzenia i ustawienia są przypisane do konta.
+- Udostępnia osobne konto `root` z panelem administracyjnym i podglądem danych wszystkich kont.
 - Filtruje listę po statusie, a także wyszukuje tytuły i kategorie.
 - Chroni formularze tokenem CSRF i waliduje dane po stronie serwera.
 - Zachowuje dane po zamknięciu aplikacji w bazie SQLite.
@@ -47,6 +53,14 @@ flask --app learnloop:create_app run --debug
 
 Wejdź na [http://127.0.0.1:5000](http://127.0.0.1:5000).
 
+Przy pierwszym uruchomieniu wybierz **Załóż konto**. Konto `root` tworzy administrator z Terminala:
+
+```bash
+flask --app learnloop create-root
+```
+
+Polecenie poprosi o e-mail i dwukrotne, niewidoczne wpisanie hasła. Hasło zostanie zapisane jako skrót w bazie, nie w pliku projektu. Jeśli podany e-mail należy już do zwykłego konta, polecenie zmieni je na `root` i ustawi nowe hasło. Z jednego e-maila może korzystać tylko jedno konto `root` w bazie. Z panelu root można przejść do własnego planera i wrócić do panelu przyciskiem w menu.
+
 ### Windows PowerShell
 
 ```powershell
@@ -67,6 +81,28 @@ flask --app learnloop:create_app run --debug
 
 Serwer deweloperski Flask jest przeznaczony do lokalnej pracy i nauki. Nie wystawiaj go bezpośrednio do publicznego internetu.
 
+## Wdrożenie na Railway
+
+Konfiguracja wdrożeniowa znajduje się w `railway.toml`. Usługa uruchamia aplikację przez Gunicorn. Bazę SQLite należy przechowywać na trwałym wolumenie Railway, aby dane przetrwały ponowne uruchomienie i nowe wdrożenie.
+
+1. Zaloguj się w [Railway](https://railway.com/) i utwórz projekt wdrażany z repozytorium GitHub `kubamarczak000/learnloop`.
+2. W ustawieniach usługi dodaj wolumen i ustaw ścieżkę montowania `/data`.
+3. W zakładce zmiennych usługi ustaw `SECRET_KEY` na długi, losowy i prywatny ciąg znaków oraz `SESSION_COOKIE_SECURE=true`. Nie dodawaj tych wartości do repozytorium.
+4. Wygeneruj domenę publiczną dopiero po ustawieniu wolumenu, sekretu i konta root.
+5. Po wdrożeniu utwórz konto administratora z Terminala. Zainstaluj Railway CLI z oficjalnej instrukcji, zaloguj je do właściwego konta i połącz z projektem. Następnie uruchom polecenie w kontekście usługi:
+
+   ```bash
+   railway ssh -- flask --app learnloop:create_app create-root
+   ```
+
+   Terminal poprosi o e-mail i hasło. Hasło nie jest wyświetlane podczas wpisywania. Zapisz je w menedżerze haseł. Konto root daje podgląd danych użytkowników, więc użyj unikalnego hasła i nie udostępniaj go.
+
+6. Otwórz wygenerowany adres Railway, załóż zwykłe konto i sprawdź logowanie, planer, kalendarz oraz zadania.
+
+Railway Hobby ma minimalną opłatę 5 USD miesięcznie i obejmuje 5 USD kredytów na zużycie zasobów; koszt może wzrosnąć po ich przekroczeniu. Sprawdź aktualny cennik przed aktywowaniem usługi. Szczegóły znajdują się w [cenniku Railway](https://docs.railway.com/pricing/plans), [dokumentacji wolumenów](https://docs.railway.com/volumes/reference) i [instrukcji Railway SSH](https://docs.railway.com/cli/ssh).
+
+**Ważne:** nie uruchamiaj aplikacji publicznie bez trwałego wolumenu i własnego `SECRET_KEY`. Zmiana lub brak wolumenu może spowodować utratę bazy, a domyślny klucz deweloperski nie nadaje się do hostingu.
+
 ## Uruchamianie testów
 
 Testy korzystają z osobnej, tymczasowej bazy danych, więc nie zmieniają lokalnych celów. Po instalacji zależności deweloperskich uruchom w katalogu projektu:
@@ -75,7 +111,9 @@ Testy korzystają z osobnej, tymczasowej bazy danych, więc nie zmieniają lokal
 python -m pytest
 ```
 
-Zestaw zawiera sześć testów sprawdzających widok główny, tworzenie i wyszukiwanie celu, walidację tytułu, dodawanie sesji oraz ustawianie i walidację tygodniowego celu.
+Zestaw zawiera dziesięć testów sprawdzających cele, sesje nauki, tygodniowy cel, kalendarz, generator planu i zadania zawodowe. Testy korzystają z osobnego konta w tymczasowej bazie.
+
+Przy pierwszej rejestracji istniejące dane z lokalnej bazy zostaną przypisane do tego konta. Każde kolejne konto zaczyna z własnym, pustym planerem.
 
 ## Gdzie są dane?
 
@@ -100,6 +138,11 @@ Przeglądarka wysyła żądanie do widoku Flask. Widok sprawdza dane, korzysta z
 - **Cel (`goals`)** ma tytuł, opis, kategorię, opcjonalny termin, status i datę utworzenia.
 - **Sesja (`study_sessions`)** należy do jednego celu i przechowuje minuty, datę oraz notatkę.
 - **Ustawienie (`app_settings`)** przechowuje tygodniowy cel czasu nauki. Postęp jest liczony dla bieżącego tygodnia, od poniedziałku do niedzieli.
+- **Wydarzenie (`calendar_events`)** zapisuje egzamin, kolokwium lub inny termin i może być połączone z celem nauki.
+- **Planowana sesja (`planned_sessions`)** przechowuje sesję wygenerowaną dla wydarzenia. Generator tworzy maksymalnie 30 sesji po 30 minut na dni robocze w okresie do sześciu tygodni przed wydarzeniem.
+- **Zadanie pracy (`work_tasks`)** przechowuje opis, termin, priorytet, status i szacowany czas. Zadania z terminem pojawiają się również w widoku kalendarza.
+- **Konto (`users`)** przechowuje adres e-mail i skrót hasła. Każde konto widzi wyłącznie własne dane; hasła nie są zapisywane w zwykłym tekście. Dostęp do widoków planera wymaga zalogowania.
+- **Konto root** ma osobną rolę i może przeglądać użytkowników, cele, zadania, wydarzenia oraz sesje ze wszystkich kont. Zwykłe konta nie mają dostępu do panelu administratora.
 - Usunięcie celu usuwa jego sesje dzięki relacji `ON DELETE CASCADE`.
 
 ## Jak uczyć się na tym projekcie

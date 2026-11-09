@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Załóż konto' if mode == 'register' else 'Zaloguj się' }} · LearnLoop{% endblock %}
+{% block content %}
+<section class="auth-page">
+  <div class="auth-intro"><span class="auth-mark">L</span><p class="eyebrow">TWOJE PLANY, TWOJE MIEJSCE</p><h1>{{ 'Zacznij planować.' if mode == 'register' else 'Witaj z powrotem.' }}</h1><p>{{ 'Utwórz konto, żeby zachować swoje cele, zadania i wydarzenia.' if mode == 'register' else 'Zaloguj się, aby wrócić do swoich planów.' }}</p></div>
+  <div class="panel auth-panel">
+    <h2>{{ 'Utwórz konto' if mode == 'register' else 'Logowanie' }}</h2>
+    {% if errors %}<div class="form-errors" role="alert">{% for error in errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
+    <form method="post" class="auth-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="email">Adres e-mail</label><input id="email" type="email" name="email" autocomplete="email" maxlength="254" value="{{ email }}" required>
+      <label for="password">Hasło</label><input id="password" type="password" name="password" autocomplete="{{ 'new-password' if mode == 'register' else 'current-password' }}" minlength="{{ 10 if mode == 'register' else 1 }}" maxlength="128" required>
+      {% if mode == 'register' %}<p class="password-hint">Użyj co najmniej 10 znaków.</p>{% endif %}
+      <button class="button full-width" type="submit">{{ 'Załóż konto' if mode == 'register' else 'Zaloguj się' }} <span aria-hidden="true">↗</span></button>
+    </form>
+    <p class="auth-switch">{% if mode == 'register' %}Masz już konto? <a href="{{ url_for('main.login') }}">Zaloguj się</a>{% else %}Nie masz konta? <a href="{{ url_for('main.register') }}">Załóż je</a>{% endif %}</p>
+  </div>
+</section>
+{% endblock %}

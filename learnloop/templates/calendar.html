@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% set month_names = ['', 'stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'] %}
+{% set event_labels = {'exam': 'Egzamin', 'colloquium': 'Kolokwium', 'deadline': 'Termin', 'other': 'Inne'} %}
+{% block title %}Kalendarz · LearnLoop{% endblock %}
+{% block content %}
+<section class="calendar-intro">
+  <div><p class="eyebrow">DATY, KTÓRE MAJĄ ZNACZENIE</p><h1>Kalendarz nauki</h1><p>Dodaj egzamin lub kolokwium, a LearnLoop rozłoży przygotowania na krótkie sesje.</p></div>
+  <a class="button" href="#new-event">Dodaj wydarzenie <span aria-hidden="true">＋</span></a>
+</section>
+
+<div class="calendar-layout">
+  <section class="panel month-panel" aria-label="Kalendarz miesięczny">
+    <div class="month-heading">
+      <a class="month-nav" href="{{ url_for('main.calendar_view', year=previous_year, month=previous_month) }}" aria-label="Poprzedni miesiąc">←</a>
+      <h2>{{ month_names[month] }} {{ year }}</h2>
+      <a class="month-nav" href="{{ url_for('main.calendar_view', year=next_year, month=next_month) }}" aria-label="Następny miesiąc">→</a>
+    </div>
+    <div class="calendar-grid calendar-weekdays" aria-hidden="true">
+      {% for weekday in ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob', 'Niedz'] %}<span>{{ weekday }}</span>{% endfor %}
+    </div>
+    <div class="calendar-month-grid">
+      {% for week in month_calendar %}
+        {% for day in week %}
+        <div class="calendar-day {% if day.month != month %}outside-month{% endif %} {% if day == today %}is-today{% endif %}">
+          <span class="day-number">{{ day.day }}</span>
+          {% for event in events_by_date.get(day.isoformat(), []) %}
+          <span class="calendar-event event-{{ event.event_type }}" title="{{ event_labels[event.event_type] }}: {{ event.title }}">{{ event.title }}</span>
+          {% endfor %}
+          {% for task in tasks_by_date.get(day.isoformat(), []) %}
+          <a class="calendar-task {% if task.status == 'done' %}task-done{% endif %}" href="{{ url_for('main.work_tasks_view') }}" title="Zadanie: {{ task.title }}">{{ task.title }}</a>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div class="calendar-legend"><span><i class="legend-exam"></i>Egzamin / kolokwium</span><span><i class="legend-deadline"></i>Termin</span><span><i class="legend-other"></i>Inne</span><span><i class="legend-task"></i>Zadanie do pracy</span></div>
+  </section>
+
+  <aside class="calendar-sidebar">
+    <section class="panel event-form-panel" id="new-event">
+      <p class="eyebrow">ZAPLANUJ Z WYPRZEDZENIEM</p><h2>Nowe wydarzenie</h2>
+      <form class="event-form" method="post" action="{{ url_for('main.add_calendar_event') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="event-title">Nazwa</label><input id="event-title" name="title" maxlength="100" placeholder="np. Egzamin z biologii" required>
+        <div class="event-form-row"><div><label for="event-date">Data</label><input id="event-date" type="date" name="event_date" min="{{ today_iso }}" value="{{ today_iso }}" required></div><div><label for="event-type">Rodzaj</label><select id="event-type" name="event_type"><option value="exam">Egzamin</option><option value="colloquium">Kolokwium</option><option value="deadline">Termin projektu</option><option value="other">Inne</option></select></div></div>
+        <label for="event-goal">Powiąż z celem <span>(opcjonalnie)</span></label><select id="event-goal" name="goal_id"><option value="">Bez powiązanego celu</option>{% for goal in goals %}<option value="{{ goal.id }}">{{ goal.title }}</option>{% endfor %}</select>
+        <label for="event-notes">Notatka <span>(opcjonalnie)</span></label><textarea id="event-notes" name="notes" rows="2" maxlength="1000" placeholder="Zakres materiału lub ważne informacje"></textarea>
+        <button class="button full-width" type="submit">Dodaj do kalendarza <span aria-hidden="true">↗</span></button>
+      </form>
+    </section>
+
+    <section class="panel upcoming-panel">
+      <div class="panel-heading"><div><p class="eyebrow">NAJBLIŻSZE</p><h2>Nadchodzące wydarzenia</h2></div><span class="panel-icon">◷</span></div>
+      {% if upcoming_events %}
+        <div class="upcoming-list">
+        {% for event in upcoming_events %}
+          <article class="upcoming-event">
+            <div class="event-date-badge"><strong>{{ event.event_date[8:10] }}</strong><span>{{ month_names[event.event_date[5:7]|int][:3] }}</span></div>
+            <div class="upcoming-event-content"><span class="event-type-label type-{{ event.event_type }}">{{ event_labels[event.event_type] }}</span><h3>{{ event.title }}</h3>{% if event.goal_title %}<p>Cel: {{ event.goal_title }}</p>{% endif %}{% if event.notes %}<p>{{ event.notes }}</p>{% endif %}</div>
+            <form method="post" action="{{ url_for('main.delete_calendar_event', event_id=event.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="icon-button" type="submit" aria-label="Usuń wydarzenie {{ event.title }}">×</button></form>
+            <form class="plan-action" method="post" action="{{ url_for('main.generate_study_plan', event_id=event.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="text-button" type="submit">Ułóż plan nauki</button></form>
+            {% if plans_by_event[event.id]['count'] %}<div class="planned-list"><strong>Plan: {{ plans_by_event[event.id]['count'] }} sesji po 30 min</strong>{% for item in plans_by_event[event.id]['items'] %}<span>{{ item.study_date }} · {{ item.label }}</span>{% endfor %}{% if plans_by_event[event.id]['count'] > plans_by_event[event.id]['items']|length %}<span>i jeszcze {{ plans_by_event[event.id]['count'] - plans_by_event[event.id]['items']|length }} sesji</span>{% endif %}</div>{% endif %}
+          </article>
+        {% endfor %}
+        </div>
+      {% else %}<div class="empty-upcoming"><span>✳</span><p>Dodaj pierwsze wydarzenie, żeby zaplanować przygotowania.</p></div>{% endif %}
+    </section>
+  </aside>
+</div>
+{% endblock %}

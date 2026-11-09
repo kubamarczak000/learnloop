@@ -9,13 +9,29 @@
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="{{ url_for('main.index') }}" aria-label="LearnLoop — strona główna">
+    <a class="brand" href="{{ url_for('main.index') if g.user else url_for('main.login') }}" aria-label="LearnLoop — strona główna">
       <span class="brand-mark">L</span><span>Learn<span class="brand-light">Loop</span></span>
     </a>
-    <nav aria-label="Główna nawigacja">
-      <a class="nav-link {% if request.endpoint == 'main.index' %}is-active{% endif %}" href="{{ url_for('main.index') }}">Przegląd</a>
-      <a class="button button-small" href="{{ url_for('main.new_goal') }}"><span aria-hidden="true">＋</span> Nowy cel</a>
-    </nav>
+    {% if g.user and g.user.role == 'root' and not session.get('root_user_mode') %}
+      <nav aria-label="Panel administratora">
+        <a class="nav-link is-active" href="{{ url_for('main.admin_dashboard') }}">Panel root</a>
+        <span class="account-email">{{ g.user.email }}</span>
+        <form method="post" action="{{ url_for('main.switch_root_view') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="target" value="user"><button class="nav-logout" type="submit">Mój planer</button></form>
+        <form method="post" action="{{ url_for('main.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="nav-logout" type="submit">Wyloguj</button></form>
+      </nav>
+    {% elif g.user %}
+      <nav aria-label="Główna nawigacja">
+        <a class="nav-link {% if request.endpoint == 'main.index' %}is-active{% endif %}" href="{{ url_for('main.index') }}">Przegląd</a>
+        <a class="nav-link {% if request.endpoint == 'main.calendar_view' %}is-active{% endif %}" href="{{ url_for('main.calendar_view') }}">Kalendarz</a>
+        <a class="nav-link {% if request.endpoint == 'main.work_tasks_view' %}is-active{% endif %}" href="{{ url_for('main.work_tasks_view') }}">Zadania</a>
+        <span class="account-email">{{ g.user.email }}</span>
+        {% if g.user.role == 'root' %}<form method="post" action="{{ url_for('main.switch_root_view') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="target" value="admin"><button class="nav-logout" type="submit">Panel root</button></form>{% endif %}
+        <form method="post" action="{{ url_for('main.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="nav-logout" type="submit">Wyloguj</button></form>
+        <a class="button button-small" href="{{ url_for('main.new_goal') }}"><span aria-hidden="true">＋</span> Nowy cel</a>
+      </nav>
+    {% else %}
+      <nav aria-label="Konto"><a class="nav-link" href="{{ url_for('main.login') }}">Zaloguj</a><a class="button button-small" href="{{ url_for('main.register') }}">Załóż konto</a></nav>
+    {% endif %}
   </header>
   <main class="shell">
     {% with messages = get_flashed_messages(with_categories=true) %}

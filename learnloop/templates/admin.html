@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Panel root · LearnLoop{% endblock %}
+{% block content %}
+<section class="admin-intro"><div><p class="eyebrow">DOSTĘP ADMINISTRACYJNY</p><h1>Panel root</h1><p>Podgląd kont i danych zapisanych w LearnLoop.</p></div><form method="post" action="{{ url_for('main.switch_root_view') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="target" value="user"><button class="button" type="submit">Przejdź do mojego planera</button></form></section>
+
+<section class="task-stats admin-stats" aria-label="Podsumowanie kont">
+  <article><span>Konta</span><strong>{{ users|length }}</strong></article>
+  <article><span>Widoczne cele</span><strong>{{ goals|length }}</strong></article>
+  <article><span>Widoczne zadania</span><strong>{{ tasks|length }}</strong></article>
+</section>
+
+<section class="panel admin-section"><div class="admin-section-heading"><div><p class="eyebrow">UŻYTKOWNICY</p><h2>Konta</h2></div><span>{{ users|length }}</span></div>
+  {% if users %}<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>E-mail</th><th>Rola</th><th>Utworzono</th><th>Cele</th><th>Zadania</th><th>Wydarzenia</th></tr></thead><tbody>{% for user in users %}<tr><td>{{ user.email }}</td><td>{{ 'Administrator' if user.role == 'root' else 'Użytkownik' }}</td><td>{{ user.created_at[:10] }}</td><td>{{ user.goal_count }}</td><td>{{ user.task_count }}</td><td>{{ user.event_count }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<p class="admin-empty">Brak kont.</p>{% endif %}
+</section>
+
+<section class="admin-section-grid">
+  <section class="panel admin-section"><div class="admin-section-heading"><div><p class="eyebrow">PLANY NAUKI</p><h2>Cele</h2></div><span>{{ goals|length }}</span></div>
+    {% if goals %}<div class="admin-record-list">{% for goal in goals %}<article><strong>{{ goal.title }}</strong><span>{{ goal.email or 'Dane bez przypisanego konta' }} · {{ goal.category }} · {{ {'active':'Aktywny','paused':'Wstrzymany','completed':'Ukończony'}[goal.status] }}</span></article>{% endfor %}</div>{% else %}<p class="admin-empty">Brak celów.</p>{% endif %}
+  </section>
+  <section class="panel admin-section"><div class="admin-section-heading"><div><p class="eyebrow">PLAN PRACY</p><h2>Zadania</h2></div><span>{{ tasks|length }}</span></div>
+    {% if tasks %}<div class="admin-record-list">{% for task in tasks %}<article><strong>{{ task.title }}</strong><span>{{ task.email or 'Dane bez przypisanego konta' }} · {{ {'todo':'Do zrobienia','in_progress':'W trakcie','done':'Ukończone'}[task.status] }}{% if task.due_date %} · {{ task.due_date }}{% endif %}</span></article>{% endfor %}</div>{% else %}<p class="admin-empty">Brak zadań.</p>{% endif %}
+  </section>
+  <section class="panel admin-section"><div class="admin-section-heading"><div><p class="eyebrow">KALENDARZ</p><h2>Wydarzenia</h2></div><span>{{ events|length }}</span></div>
+    {% if events %}<div class="admin-record-list">{% for event in events %}<article><strong>{{ event.title }}</strong><span>{{ event.email or 'Dane bez przypisanego konta' }} · {{ {'exam':'Egzamin','colloquium':'Kolokwium','deadline':'Termin','other':'Inne'}[event.event_type] }} · {{ event.event_date }}</span></article>{% endfor %}</div>{% else %}<p class="admin-empty">Brak wydarzeń.</p>{% endif %}
+  </section>
+  <section class="panel admin-section"><div class="admin-section-heading"><div><p class="eyebrow">ZAPISANA NAUKA</p><h2>Sesje</h2></div><span>{{ sessions|length }}</span></div>
+    {% if sessions %}<div class="admin-record-list">{% for item in sessions %}<article><strong>{{ item.goal_title }} · {{ item.minutes }} min</strong><span>{{ item.email }} · {{ item.studied_on }}{% if item.note %} · {{ item.note }}{% endif %}</span></article>{% endfor %}</div>{% else %}<p class="admin-empty">Brak zapisanych sesji.</p>{% endif %}
+  </section>
+  <section class="panel admin-section"><div class="admin-section-heading"><div><p class="eyebrow">AUTOMATYCZNE PRZYGOTOWANIA</p><h2>Zaplanowane sesje</h2></div><span>{{ plans|length }}</span></div>
+    {% if plans %}<div class="admin-record-list">{% for item in plans %}<article><strong>{{ item.event_title }} · {{ item.minutes }} min</strong><span>{{ item.email }} · {{ item.study_date }} · {{ item.label }}</span></article>{% endfor %}</div>{% else %}<p class="admin-empty">Brak wygenerowanych sesji.</p>{% endif %}
+  </section>
+</section>
+{% endblock %}

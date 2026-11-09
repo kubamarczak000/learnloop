@@ -21,6 +21,9 @@ To propozycja pracy rozłożonej na 8 tygodni. Etapy są przyszłym planem nauki
 - [ ] Pozwól ustawić docelową liczbę minut albo sesji dla celu.
 - [ ] Pokaż wykres czasu nauki z ostatnich 7 i 30 dni.
 - [x] Dodaj tygodniowy cel minut i informację o jego realizacji.
+- [x] Dodaj kalendarz wydarzeń i prosty generator planu nauki.
+- [x] Dodaj planer zadań zawodowych z priorytetem i terminem.
+- [ ] Pozwól użytkownikowi zmienić długość sesji oraz dni dostępne do nauki.
 - **Tematy:** agregowanie danych, daty, dostępność wykresów.
 
 ## Etap 4 — wygodniejsze użycie
@@ -32,9 +35,9 @@ To propozycja pracy rozłożonej na 8 tygodni. Etapy są przyszłym planem nauki
 
 ## Etap 5 — użytkownicy i prywatność
 
-- [ ] Dodaj rejestrację, logowanie i osobne dane dla każdego konta.
-- [ ] Zabezpiecz hasła przez bezpieczne hashowanie, nigdy zwykły tekst.
-- [ ] Dodaj eksport i import danych w formacie JSON lub CSV.
+- [x] Dodaj rejestrację, logowanie i osobne dane dla każdego konta.
+- [x] Zabezpiecz hasła przez bezpieczne hashowanie, nigdy zwykły tekst.
+- [ ] Dodaj reset hasła i eksport/import danych w formacie JSON lub CSV.
 - **Tematy:** uwierzytelnianie, autoryzacja, prywatność danych.
 
 ## Etap 6 — API
@@ -61,8 +64,8 @@ To propozycja pracy rozłożonej na 8 tygodni. Etapy są przyszłym planem nauki
 ## Proponowane kamienie milowe
 
 1. `v1.0.0` — lokalne cele i sesje.
-2. `v1.1.0` — testy i tygodniowy cel nauki (obecna wersja projektu).
-3. `v1.2.0` — migracje, ulepszona historia i dostępność.
-4. `v2.0.0` — użytkownicy, API i wdrożenie.
+2. `v1.1.0` — testy i tygodniowy cel nauki.
+3. `v1.2.0` — kalendarz, plan nauki i planer pracy (obecna wersja projektu).
+4. `v2.0.0` — AI jako opcjonalny doradca planu, reset hasła i wdrożenie.
 
 Warto opisywać każdą zmianę zgodnie z tym, co naprawdę zostało zrobione: commitami, issue i krótkimi notatkami z nauki.

@@ -1,6 +1,6 @@
 """Testy najważniejszych zachowań LearnLoop."""
 
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
 
@@ -8,9 +8,9 @@ from learnloop import create_app
 
 
 @pytest.fixture
-def client(tmp_path):
+def app(tmp_path):
     """Każdy test dostaje osobną, tymczasową bazę danych."""
-    app = create_app(
+    return create_app(
         {
             "TESTING": True,
             "SECRET_KEY": "test-secret-key",
@@ -18,8 +18,21 @@ def client(tmp_path):
             "WTF_CSRF_ENABLED": False,
         }
     )
-    with app.test_client() as test_client:
-        yield test_client
+
+
+@pytest.fixture
+def client(app):
+    test_client = app.test_client()
+    test_client.post(
+        "/register",
+        data={"email": "owner@example.test", "password": "bezpieczne-haslo-123"},
+    )
+    return test_client
+
+
+@pytest.fixture
+def anonymous_client(app):
+    return app.test_client()
 
 
 def add_goal(client, title="Nauka Pythona"):
@@ -107,4 +120,74 @@ def test_weekly_goal_rejects_values_below_minimum(client):
     )
 
     assert "Tygodniowy cel musi wynosić od 15 do 10 080 minut." in response.get_data(as_text=True)
+
+
+def test_calendar_event_can_generate_weekday_study_plan(client):
+    event_date = date.today() + timedelta(days=7)
+    response = client.post(
+        "/calendar/events",
+        data={
+            "title": "Kolokwium z biologii",
+            "event_date": event_date.isoformat(),
+            "event_type": "colloquium",
+            "goal_id": "",
+            "notes": "Rozdziały 1–3",
+        },
+        follow_redirects=True,
+    )
+    assert "Kolokwium z biologii" in response.get_data(as_text=True)
+
+    response = client.post("/calendar/events/1/plan", follow_redirects=True)
+    page = response.get_data(as_text=True)
+    assert response.status_code == 200
+    assert "Ułożono plan:" in page
+    assert "sesji po 30 min" in page
+    assert "Przygotowanie: Kolokwium z biologii" in page
+
+
+def test_calendar_rejects_past_events(client):
+    yesterday = date.today() - timedelta(days=1)
+    response = client.post(
+        "/calendar/events",
+        data={"title": "Minione kolokwium", "event_date": yesterday.isoformat(), "event_type": "exam"},
+        follow_redirects=True,
+    )
+
+    assert "Wybierz dzisiejszą lub przyszłą datę." in response.get_data(as_text=True)
+    assert "Minione kolokwium" not in response.get_data(as_text=True)
+
+
+def test_work_task_can_be_added_and_started(client):
+    response = client.post(
+        "/tasks",
+        data={
+            "title": "Przygotować raport",
+            "description": "Podsumować wyniki tygodnia",
+            "due_date": date.today().isoformat(),
+            "priority": "high",
+            "estimate_minutes": "45",
+        },
+        follow_redirects=True,
+    )
+    page = response.get_data(as_text=True)
+    assert response.status_code == 200
+    assert "Przygotować raport" in page
+    assert "Wysoki" in page
+
+    response = client.post(
+        "/tasks/1/status", data={"status": "in_progress"}, follow_redirects=True
+    )
+    assert "W trakcie" in response.get_data(as_text=True)
+
+
+def test_work_task_due_date_appears_in_calendar(client):
+    due_date = date.today() + timedelta(days=3)
+    client.post(
+        "/tasks",
+        data={"title": "Wysłać ofertę", "due_date": due_date.isoformat()},
+    )
+
+    response = client.get(f"/calendar?year={due_date.year}&month={due_date.month}")
+
+    assert "Wysłać ofertę" in response.get_data(as_text=True)
 
