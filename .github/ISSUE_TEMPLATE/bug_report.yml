@@ -1,0 +1,45 @@
+name: Zgłoś błąd
+description: Opisz problem, który można odtworzyć w LearnLoop.
+title: "[Błąd]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Przed wysłaniem sprawdź, czy podobne zgłoszenie już nie istnieje.
+  - type: textarea
+    id: expected
+    attributes:
+      label: Oczekiwane działanie
+      description: Co powinno się wydarzyć?
+      placeholder: Opisz oczekiwany rezultat.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Rzeczywisty rezultat
+      description: Co wydarzyło się zamiast tego?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Kroki odtworzenia
+      description: Wypisz kroki, które prowadzą do problemu.
+      placeholder: |
+        1. Otwórz…
+        2. Wybierz…
+        3. Zobacz błąd…
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Przeglądarka i system
+      placeholder: np. Safari na macOS
+  - type: textarea
+    id: context
+    attributes:
+      label: Dodatkowy kontekst
+      description: Dodaj bezpieczny, pozbawiony danych prywatnych zrzut ekranu lub komunikat.

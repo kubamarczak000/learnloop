@@ -1,0 +1,29 @@
+name: Zaproponuj funkcję
+description: Zaproponuj ulepszenie LearnLoop i wyjaśnij, komu pomoże.
+title: "[Pomysł]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Jaki problem rozwiąże ta funkcja?
+      description: Opisz sytuację i obecne ograniczenie.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proponowane rozwiązanie
+      description: Jak funkcja mogłaby działać?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Rozważane alternatywy
+      description: Czy widzisz prostszy sposób osiągnięcia tego celu?
+  - type: textarea
+    id: learning
+    attributes:
+      label: Czego można się przy tym nauczyć?
+      description: Opcjonalnie wskaż zagadnienia techniczne do przećwiczenia.

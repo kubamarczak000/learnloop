@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "learnloop"
 version = "1.0.0"
-description = "Lokalna aplikacja webowa do planowania nauki i zapisywania sesji."
+description = "Polskojęzyczny planer nauki i pracy z kalendarzem, zadaniami i sesjami."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

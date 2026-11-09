@@ -1,71 +1,43 @@
 # Plan rozwoju LearnLoop
 
-To propozycja pracy rozłożonej na 8 tygodni. Etapy są przyszłym planem nauki, a nie historią rzekomych wcześniejszych prac. Każdy etap można opisać w osobnym issue lub pull requeście na GitHubie.
+Roadmapa opisuje obecny stan projektu i możliwe następne kroki. To plan, nie lista funkcji, które już istnieją. Kolejność może się zmieniać; aktualne zadania można śledzić w [GitHub Issues](https://github.com/kubamarczak000/learnloop/issues).
 
-## Etap 1 — solidne podstawy
+## Obecnie dostępne
 
-- [ ] Poznaj strukturę Flask i fabrykę `create_app`.
-- [x] Dodaj automatyczne testy dla podstawowych formularzy i zachowań.
-- [ ] Naucz się uruchamiać testy i sprawdzać pokrycie kodu.
-- **Tematy:** funkcje, importy, wyjątki, pytest, klient testowy Flask.
+- Cele nauki, sesje, statystyki i tygodniowy cel czasu.
+- Kalendarz wydarzeń z generowaniem planu nauki.
+- Planer zadań zawodowych.
+- Rejestracja, logowanie, role użytkowników i panel administratora.
+- Podstawowy zestaw testów automatycznych.
+- Wdrożenie na Railway z SQLite i trwałym wolumenem.
 
-## Etap 2 — jakość danych
+## Następne kroki
 
-- [ ] Dodaj migracje bazy danych zamiast ręcznej zmiany `schema.sql`.
-- [ ] Dodaj edycję i usuwanie notatek bezpośrednio z historii.
-- [ ] Rozważ archiwizację celu zamiast jego trwałego usunięcia.
-- **Tematy:** relacyjne bazy danych, migracje, integralność danych.
+- [ ] Rozszerzyć testy o rejestrację, logowanie, izolację danych kont i uprawnienia administratora.
+- [ ] Dodać eksport danych użytkownika do JSON lub CSV.
+- [ ] Dodać edycję i archiwizację celów oraz edycję notatek z sesji.
+- [ ] Wprowadzić migracje bazy, aby bezpiecznie zmieniać schemat przy kolejnych wersjach.
+- [ ] Ułatwić pracę z długimi listami przez sortowanie i paginację.
 
-## Etap 3 — lepszy postęp
+## Dalsze pomysły
 
-- [ ] Pozwól ustawić docelową liczbę minut albo sesji dla celu.
-- [ ] Pokaż wykres czasu nauki z ostatnich 7 i 30 dni.
-- [x] Dodaj tygodniowy cel minut i informację o jego realizacji.
-- [x] Dodaj kalendarz wydarzeń i prosty generator planu nauki.
-- [x] Dodaj planer zadań zawodowych z priorytetem i terminem.
-- [ ] Pozwól użytkownikowi zmienić długość sesji oraz dni dostępne do nauki.
-- **Tematy:** agregowanie danych, daty, dostępność wykresów.
+- Reset hasła i e-mailowe przypomnienia. Wymagają konfiguracji dostawcy poczty oraz bezpiecznego przechowywania jego sekretów.
+- Opcjonalne sugestie AI do planu nauki, z możliwością działania aplikacji bez tej integracji.
+- Wersjonowane API JSON i opis OpenAPI.
+- Wykres aktywności z ostatnich 7 i 30 dni oraz bardziej elastyczna dostępność sesji.
+- Dalsza poprawa dostępności, w tym obsługa klawiaturą i czytnikami ekranu.
 
-## Etap 4 — wygodniejsze użycie
+## Co można poćwiczyć
 
-- [ ] Dodaj paginację historii długich celów.
-- [ ] Dodaj sortowanie po terminie, nazwie i ostatniej sesji.
-- [ ] Zadbaj o pełną obsługę klawiaturą i komunikaty dla czytników ekranu.
-- **Tematy:** UX, semantyczny HTML, dostępność.
+1. Prześledź formularz od szablonu HTML do widoku Flask i zapytania SQLite.
+2. Wybierz małe zadanie z roadmapy i otwórz dla niego issue.
+3. Utwórz osobny branch, opisz zmianę w commitach i dodaj lub popraw test.
+4. Uzupełnij README, jeśli zmieni się sposób uruchomienia albo zachowanie aplikacji.
+5. W pull requeście opisz, czego się nauczyłeś i jak sprawdziłeś zmianę.
 
-## Etap 5 — użytkownicy i prywatność
+## Znane ograniczenia
 
-- [x] Dodaj rejestrację, logowanie i osobne dane dla każdego konta.
-- [x] Zabezpiecz hasła przez bezpieczne hashowanie, nigdy zwykły tekst.
-- [ ] Dodaj reset hasła i eksport/import danych w formacie JSON lub CSV.
-- **Tematy:** uwierzytelnianie, autoryzacja, prywatność danych.
-
-## Etap 6 — API
-
-- [ ] Wydziel wersjonowane API JSON dla celów i sesji.
-- [ ] Opisz odpowiedzi, błędy i przykładowe żądania.
-- [ ] Dodaj mały klient JavaScript albo aplikację mobilną.
-- **Tematy:** REST, statusy HTTP, serializacja, OpenAPI.
-
-## Etap 7 — uruchamianie poza komputerem lokalnym
-
-- [ ] Dodaj konfigurację produkcyjną i serwer WSGI.
-- [ ] Skonfiguruj Docker oraz trwały wolumen na bazę.
-- [ ] Dodaj pipeline CI do sprawdzania formatowania i uruchamiania testów.
-- **Tematy:** środowiska, kontenery, CI/CD, sekrety.
-
-## Etap 8 — dopracowane portfolio
-
-- [ ] Dodaj autentyczne zrzuty ekranu i krótki pokaz działania.
-- [ ] Uzupełnij README o decyzje projektowe i znane ograniczenia.
-- [ ] Poproś kogoś o code review i opisz, czego nauczyła Cię poprawka.
-- **Tematy:** GitHub, code review, komunikacja techniczna.
-
-## Proponowane kamienie milowe
-
-1. `v1.0.0` — lokalne cele i sesje.
-2. `v1.1.0` — testy i tygodniowy cel nauki.
-3. `v1.2.0` — kalendarz, plan nauki i planer pracy (obecna wersja projektu).
-4. `v2.0.0` — AI jako opcjonalny doradca planu, reset hasła i wdrożenie.
-
-Warto opisywać każdą zmianę zgodnie z tym, co naprawdę zostało zrobione: commitami, issue i krótkimi notatkami z nauki.
+- Aplikacja nie wysyła obecnie e-maili, nie resetuje haseł i nie integruje się z AI.
+- Plan nauki przed wydarzeniem jest prostą regułą opartą na sesjach po 30 minut w dni robocze, a nie spersonalizowanym algorytmem.
+- SQLite na hostingu wymaga trwałego wolumenu. Bez niego baza może zniknąć przy ponownym wdrożeniu.
+- Panel `root` może przeglądać dane wszystkich kont; należy ograniczyć dostęp do tego konta.
