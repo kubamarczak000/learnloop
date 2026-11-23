@@ -1,14 +1,16 @@
 # LearnLoop
 
-**Polskojęzyczny planer nauki i pracy.** Zapisuj cele i sesje nauki, pilnuj egzaminów w kalendarzu i porządkuj zadania zawodowe.
+**Polskojęzyczny planer nauki i pracy.** Zapisuj cele i sesje nauki, pilnuj egzaminów w kalendarzu i porządkuj zadania zawodowe. Repozytorium zawiera również osobistą stronę portfolio zbudowaną w React, Bootstrapie i Flasku z API GraphQL.
 
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.x-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-**[Otwórz działającą aplikację](https://learnloop-production-bfea.up.railway.app)** · **[Zgłoś błąd](https://github.com/kubamarczak000/learnloop/issues/new?template=bug_report.yml)** · **[Zapoznaj się z planem rozwoju](docs/ROADMAP.md)**
+**[Portfolio](https://learnloop-production-bfea.up.railway.app)** · **[Zaloguj do LearnLoop](https://learnloop-production-bfea.up.railway.app/login)** · **[Zgłoś błąd](https://github.com/kubamarczak000/learnloop/issues/new?template=bug_report.yml)**
 
 LearnLoop to projekt portfolio zbudowany we Flasku i SQLite. Aplikacja działa w przeglądarce, obsługuje osobne konta użytkowników i jest wdrożona na Railway.
+
+Osobiste portfolio jest stroną główną aplikacji (`/`). Lista wybranych projektów jest dostarczana przez publiczny, tylko do odczytu endpoint GraphQL `/api/graphql`. LearnLoop jest jednym z projektów i prowadzi do logowania oraz repozytorium. Planer po zalogowaniu jest dostępny pod `/planer`.
 
 ## Funkcje
 
@@ -40,7 +42,7 @@ Otwórz `.env`, wygeneruj własny `SECRET_KEY` poleceniem `python -c 'import sec
 flask --app learnloop:create_app run --debug
 ```
 
-Otwórz [http://127.0.0.1:5000](http://127.0.0.1:5000) i wybierz **Załóż konto**. Do korzystania z aplikacji wymagane jest konto LearnLoop; nie jest potrzebny zewnętrzny klucz API.
+Otwórz [http://127.0.0.1:5000](http://127.0.0.1:5000), aby zobaczyć portfolio. Wybierz **Załóż konto** lub przejdź do `/register`, aby utworzyć konto LearnLoop. Po zalogowaniu planer otworzy się pod `/planer`; nie jest potrzebny zewnętrzny klucz API.
 
 Konto `root` tworzy się z Terminala:
 

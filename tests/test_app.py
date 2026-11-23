@@ -52,7 +52,7 @@ def test_home_page_loads(client):
     response = client.get("/")
 
     assert response.status_code == 200
-    assert "Twoje cele" in response.get_data(as_text=True)
+    assert "portfolio-root" in response.get_data(as_text=True)
 
 
 def test_user_can_create_and_find_goal(client):
@@ -61,7 +61,7 @@ def test_user_can_create_and_find_goal(client):
     assert response.status_code == 200
     assert "Nauka Pythona" in response.get_data(as_text=True)
 
-    search_response = client.get("/?q=Python")
+    search_response = client.get("/planer?q=Python")
     assert "Nauka Pythona" in search_response.get_data(as_text=True)
 
 
@@ -77,7 +77,7 @@ def test_goal_requires_a_title(client):
 
 def test_user_can_add_study_session(client):
     add_goal(client)
-    home = client.get("/").get_data(as_text=True)
+    home = client.get("/planer").get_data(as_text=True)
     # Link do szczegółów wskazuje ID celu utworzonego powyżej.
     assert "/goals/1" in home
 

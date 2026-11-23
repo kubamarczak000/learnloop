@@ -5,9 +5,10 @@ from datetime import date, timedelta
 import re
 import sqlite3
 
-from flask import Blueprint, abort, flash, g, redirect, render_template, request, session, url_for
+from flask import Blueprint, abort, flash, g, jsonify, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from . import csrf
 from .db import get_db
 
 bp = Blueprint("main", __name__)
@@ -27,6 +28,8 @@ def load_user_and_require_login():
     if request.endpoint == "static":
         return None
     if g.user is not None and g.user["role"] == "root":
+        if request.endpoint in {"main.portfolio", "main.portfolio_alias", "main.portfolio_graphql"}:
+            return None
         if request.endpoint in {"main.logout", "main.switch_root_view"}:
             return None
         if session.get("root_user_mode"):
@@ -36,13 +39,50 @@ def load_user_and_require_login():
         if request.endpoint == "main.admin_dashboard":
             return None
         return redirect(url_for("main.admin_dashboard"))
-    if request.endpoint in {"main.login", "main.register"}:
+    if request.endpoint in {
+        "main.login", "main.register", "main.portfolio", "main.portfolio_alias", "main.portfolio_graphql"
+    }:
         return None
     if request.endpoint == "main.admin_dashboard":
         abort(403)
     if g.user is None:
         return redirect(url_for("main.login", next=request.full_path.rstrip("?")))
     return None
+
+
+@bp.get("/")
+def portfolio():
+    """Public homepage for the portfolio and its selected projects."""
+    return render_template("portfolio.html")
+
+
+@bp.get("/portfolio")
+def portfolio_alias():
+    """Keep the earlier portfolio URL working while using the domain root."""
+    return redirect(url_for("main.portfolio"), code=301)
+
+
+@csrf.exempt
+@bp.post("/api/graphql")
+def portfolio_graphql():
+    """Read-only GraphQL API used by the portfolio's React interface."""
+    from graphql import graphql_sync
+
+    from .portfolio_api import schema
+
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict) or not isinstance(payload.get("query"), str):
+        return jsonify({"errors": [{"message": "Wymagane jest zapytanie GraphQL."}]}), 400
+    result = graphql_sync(
+        schema,
+        payload["query"],
+        variable_values=payload.get("variables"),
+        operation_name=payload.get("operationName"),
+    )
+    response = {"data": result.data}
+    if result.errors:
+        response["errors"] = [{"message": str(error)} for error in result.errors]
+    return jsonify(response), 200 if not result.errors else 400
 
 
 def _current_user_id() -> int:
@@ -225,7 +265,7 @@ def _goal_form_values() -> tuple[dict, list[str]]:
     }, errors
 
 
-@bp.get("/")
+@bp.get("/planer")
 def index():
     connection = get_db()
     selected_status = request.args.get("status", "all")

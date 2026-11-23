@@ -9,7 +9,7 @@
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="{{ url_for('main.index') if g.user else url_for('main.login') }}" aria-label="LearnLoop — strona główna">
+    <a class="brand" href="{{ url_for('main.portfolio') }}" aria-label="Portfolio — strona główna">
       <span class="brand-mark">L</span><span>Learn<span class="brand-light">Loop</span></span>
     </a>
     {% if g.user and g.user.role == 'root' and not session.get('root_user_mode') %}
